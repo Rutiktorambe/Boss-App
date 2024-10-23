@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Timesheet Home</title>
+  </head>
+  <body>
+    <h1>Timesheet Home</h1>
+    <a href="{{ url_for('logout') }}">Logout</a>
+    <a href="{{ url_for('fill_timesheet') }}">Fill Timesheet</a><br />
+    <a href="{{ url_for('view_summary') }}">View Timesheet Summary</a><br />
+    {% if is_manager %}
+    <a href="/manager_only_page">Manager Actions</a>
+    {% endif %}
+  </body>
+</html>

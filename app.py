@@ -1,74 +1,86 @@
-from functools import wraps
-from flask import Flask, render_template, request, redirect, url_for, flash, session
-from models import db, Employee
-from config import Config
+from flask import Flask, render_template, request, redirect, session, url_for
+from models import db, Employee, TimesheetEntry
+from datetime import timedelta
 
 app = Flask(__name__)
-app.config.from_object(Config)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///emsdatabase.db'
+app.config['SECRET_KEY'] = 'yoursecretkey'
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=5)  # Set session timeout to 5 minutes
 
 db.init_app(app)
 
-# Login required decorator
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'user_id' not in session:  
-            return redirect(url_for('login')) 
-        return f(*args, **kwargs)
-    return decorated_function
+# Check for user inactivity
+@app.before_request
+def session_management():
+    session.permanent = True
+    session.modified = True
 
-@app.route('/')
-def index():
-    return redirect(url_for('login'))  # Redirect to login if accessing root
-
-@app.route('/login', methods=['GET', 'POST'])
+# Login Page (Renamed from Landing)
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])  # Allow both '/' and '/login' URLs
 def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-
-        user = Employee.query.filter_by(username=username).first()
-
-        if user and user.Password == password: 
-            session['user_id'] = user.EMPID
-            session['username'] = user.username
-            session.permanent = True  
+        user = Employee.query.filter_by(username=username, Password=password).first()
+        if user:
+            session['EMPID'] = user.EMPID
+            session.permanent = True  # Mark the session as permanent to use timeout
             return redirect(url_for('home'))
         else:
-            flash('Invalid username or password')
-
+            return "Invalid credentials"
     return render_template('login.html')
 
-@app.route('/home')
-@login_required  
-def home():
-    # Fetch the logged-in user's details
-    user_id = session['user_id']
-    user = Employee.query.filter_by(EMPID=user_id).first()
-
-    # Fetch the line manager's name
-    line_manager_name = Employee.query.filter_by(EMPID=user.LineManagerID).first().EName if user.LineManagerID else None
-
-    return render_template('home.html', user=user, line_manager_name=line_manager_name)
-
-@app.route('/timesheet')
-@login_required
-def timesheet():
-    user_id = session['user_id']
-    user = Employee.query.filter_by(EMPID=user_id).first()
-
-    # Check if user is a manager
-    is_manager = user.LineManagerID is None  # Assuming managers do not have a line manager
-
-    return render_template('timesheet.html', user=user, is_manager=is_manager)
-
+# Logout route
 @app.route('/logout')
-@login_required  
 def logout():
-    session.clear() 
+    session.pop('EMPID', None)
     return redirect(url_for('login'))
+
+# Home Page
+@app.route('/home')
+def home():
+    if 'EMPID' not in session:
+        return redirect(url_for('login'))
+    
+    emp = Employee.query.filter_by(EMPID=session['EMPID']).first()
+    return render_template('home.html', emp=emp)
+
+# Timesheet Home Page
+@app.route('/timesheet')
+def timesheet_home():
+    if 'EMPID' not in session:
+        return redirect(url_for('login'))
+
+    emp = Employee.query.filter_by(EMPID=session['EMPID']).first()
+    is_manager = Employee.query.filter_by(LineManagerID=emp.EMPID).count() > 0
+    
+    return render_template('timesheet_home.html', emp=emp, is_manager=is_manager)
+
+# Fill Timesheet
+@app.route('/timesheet/fill', methods=['GET', 'POST'])
+def fill_timesheet():
+    if 'EMPID' not in session:
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        # Add timesheet entry logic here
+        pass
+
+    return render_template('fill_timesheet.html')
+
+# View Timesheet Summary
+@app.route('/timesheet/summary')
+def view_summary():
+    if 'EMPID' not in session:
+        return redirect(url_for('login'))
+
+    emp = Employee.query.filter_by(EMPID=session['EMPID']).first()
+    entries = TimesheetEntry.query.filter_by(EmpID=emp.EMPID).all()
+    
+    return render_template('view_summary.html', entries=entries)
 
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()  # Ensure tables are created
+        db.create_all()
     app.run(debug=True)
