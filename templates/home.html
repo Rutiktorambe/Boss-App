@@ -1,0 +1,33 @@
+<!-- templates/home.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Home</title>
+  </head>
+  <body>
+    <h1>Welcome, {{ user.EName }}</h1>
+    <h2>Your Details:</h2>
+    <ul>
+      <li>Employee ID: {{ user.EMPID }}</li>
+      <li>Email: {{ user.EEMail }}</li>
+      <li>System ID: {{ user.SystemID }}</li>
+      <li>Profile: {{ user.Profile }}</li>
+      <li>Team: {{ user.Team }}</li>
+    </ul>
+
+    {% if line_manager_name %}
+    <h2>Your Line Manager:</h2>
+    <p>Name: {{ line_manager_name }}</p>
+    {% else %}
+    <h2>You do not have a line manager assigned.</h2>
+    {% endif %}
+
+    <h2>Options</h2>
+    <ul>
+      <li><a href="{{ url_for('timesheet') }}">Timesheet</a></li>
+    </ul>
+
+    <a href="{{ url_for('logout') }}">Logout</a>
+  </body>
+</html>
