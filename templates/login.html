@@ -3,10 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login Page</title>
+    <title>Login</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
   </head>
   <body>
-    <h1>Login</h1>
+    <h2>Login</h2>
     <form method="POST" action="/login">
       <label for="username">Username:</label>
       <input type="text" name="username" required /><br />
@@ -15,4 +19,13 @@
       <button type="submit">Login</button>
     </form>
   </body>
+  <script>
+    if (
+      performance.navigation.type === performance.navigation.TYPE_BACK_FORWARD
+    ) {
+      window.location.href = "/logout";
+    }
+  </script>
 </html>
+
+

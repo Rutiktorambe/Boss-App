@@ -3,17 +3,52 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Home Page</title>
+    <title>Document</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/home/home.css') }}"
+    />
   </head>
   <body>
-    <h1>Welcome, {{ emp.EName }}</h1>
-    <p>EMPID: {{ emp.EMPID }}</p>
-    <p>Username: {{ emp.username }}</p>
-    <p>Email: {{ emp.EEMail }}</p>
-    <p>Team: {{ emp.Team }}</p>
-    <p>Line Manager: {{ emp.LineManager }}</p>
+    <div>{% include 'navbar/navbar.html' %}</div>
+    <div class="home-box">
+      <div class="home-banner">
+        <h2>Welcome, <span> {{ emp.EName }}</span></h2>
+        <p>
+          <!-- Role:
+          <span>
+            {{ Role }}
+            <span style="color: black; font-size: larger">|</span></span
+          > -->
+          Team:
+          <span
+            >{{ emp.Team }}
+            <span style="color: black; font-size: larger">|</span></span
+          >
+          Manager:
+          <span>
+            {{ emp.LineManager }}
+            <span style="color: black; font-size: larger">|</span></span
+          >
+          Employee id:
+          <span> {{ emp.EMPID }}</span>
+        </p>
+      </div>
 
-    <a href="{{ url_for('timesheet_home') }}">Go to Timesheet</a>
-    <a href="{{ url_for('logout') }}">Logout</a>
+      <div class="home-services">
+        <h3>Available Services</h3>
+        <ul>
+          <a href="{{ url_for('timesheet_home') }}"><li>Timesheet</li></a>
+          <a href=""><li>Leave Management</li></a>
+          <a href=""><li>IT Helpdesk</li></a>
+          <a href=""><li>Finance Reports</li></a>
+          <a href=""><li>HR Portal</li></a>
+          <a href=""><li>Project Management</li></a>
+          <a href=""><li>Performance Reviews</li></a>
+          <a href=""><li>Training Portal</li></a>
+          <a href=""><li>Customer Support</li></a>
+        </ul>
+      </div>
+    </div>
   </body>
 </html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Navbar</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/navbar/navbar.css') }}"
+    />
+  </head>
+  <body>
+    <header id="navbar">
+      <nav class="navbar-container container">
+        <a href="/home" class="home-link">
+          <div class="navbar-logo">
+            <img
+              src="{{ url_for('static', filename='images/logo.png') }}"
+              alt="Logo"
+            />
+          </div>
+        </a>
+        <div class="navbar-links">
+          <a class="navbar-link" href="/home">Home</a>
+          <a class="navbar-link" href="{{ url_for('logout') }}">Logout</a>
+          <div class="navInfo" data-toggle="false">
+            <a class="navbar-link-name" href="#">
+              <span>{{ emp.EName }}</span>
+            </a>
+            <div class="navInfoCard">
+              <div class="card-info">Email: <span>{{ emp.EEMail }}</span></div>
+              <div class="card-info">
+                Employee ID: <span> {{ emp.EMPID }}</span>
+              </div>
+              <div class="card-info">Role: <span>{{ Role }}</span></div>
+              <div class="card-info">Team: <span> {{ emp.Team }}</span></div>
+              <div class="card-info">
+                Manager: <span> {{ emp.LineManager }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const navInfo = document.querySelector(".navInfo");
+        const navInfoCard = document.querySelector(".navInfoCard");
+
+        if (navInfo) {
+          navInfo.addEventListener("click", (e) => {
+            e.stopPropagation();
+            navInfo.classList.toggle("active");
+          });
+
+          document.addEventListener("click", (e) => {
+            if (!navInfo.contains(e.target)) {
+              navInfo.classList.remove("active");
+            }
+          });
+
+          if (navInfoCard) {
+            navInfoCard.addEventListener("click", (e) => {
+              e.stopPropagation();
+            });
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

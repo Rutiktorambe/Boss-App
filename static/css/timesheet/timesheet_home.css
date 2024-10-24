@@ -1,0 +1,51 @@
+.ts-home a {
+  text-decoration: none;
+  color: white;
+  display: block;
+}
+.ts-home {
+  display: flex;
+  flex-direction: column;
+  margin: 64px;
+  justify-content: center;
+  align-items: center;
+}
+
+.ts-home h2 {
+  font-size: 30px;
+  padding: 2px;
+  text-decoration: underline;
+}
+
+.ts-home ul {
+  list-style-type: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  text-align: center;
+}
+
+.ts-home li {
+  height: 6rem;
+  width: 10rem;
+  padding: 20px;
+  margin: 20px;
+  border: 1px solid black;
+  box-sizing: border-box;
+  background-color: #0ca8c7;
+  color: white;
+  font-size: 20px;
+  text-shadow: 1px 1px 1px black;
+  align-content: center;
+  border-radius: 10px;
+  font-weight: bold;
+}
+.ts-home li:hover {
+  color: white;
+  background-color: rgb(255, 0, 85); /* Hover effect for li */
+}
+
+.ts-home li:hover a {
+  color: black; /* Color change for the text on hover */
+  text-shadow: 0.5px 0.5px 1.5px whitesmoke;
+}

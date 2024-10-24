@@ -1,0 +1,70 @@
+a {
+  text-decoration: none;
+  color: black;
+}
+.home-box {
+  display: flex;
+  flex-direction: column;
+  margin: 64px;
+  justify-content: center;
+  align-items: center;
+}
+.home-banner {
+  margin-top: 15px;
+  text-align: center;
+  background-color: #0ca8c7;
+  width: 100%;
+  border-radius: 20px;
+  box-shadow: 3px 3px 3px black;
+  font-weight: 800;
+  font-size: 20px;
+}
+.home-banner h2 {
+  color: rgb(255, 0, 85);
+  text-shadow: 1px 1px 1px black;
+}
+.home-banner span {
+  padding: 3px;
+  color: aliceblue;
+  text-shadow: 1px 1px 1px black;
+}
+
+.home-services {
+  text-align: center;
+}
+
+.home-services h3 {
+  font-size: 30px;
+  padding: 2px;
+  text-decoration: underline;
+}
+
+.home-services ul {
+  list-style-type: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.home-services li {
+  font-family: sans-serif;
+  height: 6rem;
+  width: 10rem;
+  padding: 20px;
+  margin: 20px;
+  border: 1px solid black;
+  box-sizing: border-box;
+  background-color: #0ca8c7;
+  font-size: 20px;
+  color: whitesmoke;
+  text-shadow: 1px 1px 1px black;
+  align-content: center;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.home-services li:hover {
+  color: #020000;
+  background-color: rgb(255, 0, 85);
+  text-shadow: 1px 0.5px 1.5px white;
+}

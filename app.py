@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, session, url_for
 from models import db, Employee, TimesheetEntry
-from datetime import timedelta
+from datetime import timedelta ,datetime
+import uuid  # For generating unique IDs
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///emsdatabase.db'
@@ -58,10 +59,7 @@ def timesheet_home():
     return render_template('timesheet_home.html', emp=emp, is_manager=is_manager)
 
 # Fill Timesheet
-from flask import Flask, render_template, request, redirect, session, url_for
-from models import db, Employee, TimesheetEntry
-from datetime import datetime
-import uuid  # For generating unique IDs
+
 
 @app.route('/timesheet/fill', methods=['GET', 'POST'])
 def fill_timesheet():

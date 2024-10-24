@@ -3,15 +3,25 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Timesheet Home</title>
+    <title>Document</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/timesheet/timesheet_home.css') }}"
+    />
   </head>
   <body>
-    <h1>Timesheet Home</h1>
-    <a href="{{ url_for('logout') }}">Logout</a>
-    <a href="{{ url_for('fill_timesheet') }}">Fill Timesheet</a><br />
-    <a href="{{ url_for('view_summary') }}">View Timesheet Summary</a><br />
-    {% if is_manager %}
-    <a href="/manager_only_page">Manager Actions</a>
-    {% endif %}
+    <div>{% include 'navbar/navbar.html' %}</div>
+    <div class="ts-home">
+      <h2>Timesheet Services</h2>
+      <ul>
+        <li><a href="{{ url_for('fill_timesheet') }}">Fill Timesheet</a></li>
+        <li>
+          <a href="{{ url_for('view_summary') }}">View Summary</a>
+        </li>
+        {% if is_manager %}
+        <li><a href="/manager_only_page">Manager Actions</a></li>
+        {% endif %}
+      </ul>
+    </div>
   </body>
 </html>
