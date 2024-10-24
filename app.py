@@ -18,7 +18,7 @@ def session_management():
 
 # Login Page (Renamed from Landing)
 @app.route('/', methods=['GET', 'POST'])
-@app.route('/login', methods=['GET', 'POST'])  # Allow both '/' and '/login' URLs
+@app.route('/login', methods=['GET', 'POST']) 
 def login():
     if request.method == 'POST':
         username = request.form['username']
@@ -208,6 +208,24 @@ def next_week():
 
 
 
+
+
+# # Route for home page (protected)
+# @app.route('/error')
+# def error():
+#     if 'EMPID' not in session:
+#         return redirect(url_for('login'))
+
+#     emp = Employee.query.filter_by(EMPID=session['EMPID']).first()
+#     return render_template('error/error.html',emp=emp,)
+
+# @app.errorhandler(404)
+# def page_not_found(e):
+#     if 'EMPID' not in session:
+#         return redirect(url_for('login'))
+
+#     emp = Employee.query.filter_by(EMPID=session['EMPID']).first()
+#     return  redirect(url_for('error'))
 
 
 
