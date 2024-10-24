@@ -93,13 +93,13 @@ def fill_timesheet():
                     nonbillable_training_time = total_time
 
             entry = TimesheetEntry(
-                Uniq_ID=str(uuid.uuid4()),  # Generate unique ID
+                Uniq_ID=str(uuid.uuid4()),
                 EName=emp.EName,
                 EmpID=emp.EMPID,
                 Team=emp.Team,
                 LineManager=emp.LineManager,
                 DateofEntry=date,
-                StartTime=request.form['hours'],  # Hours worked
+                StartTime=request.form['hours'], 
                 EndTime=request.form['minutes'],
                 Hours=request.form['hours'],
                 Minutes=request.form['minutes'],
@@ -129,29 +129,24 @@ def fill_timesheet():
 
 @app.route('/timesheet/summary', methods=['GET'])
 def view_summary():
-    # Get the date parameter or use the current date
     if 'EMPID' not in session:
         return redirect(url_for('login'))
 
     emp = Employee.query.filter_by(EMPID=session['EMPID']).first()
     selected_date_str = request.args.get('date', datetime.today().strftime('%Y-%m-%d'))
     
-    # Convert the string to a date object if needed
     selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
 
-    # Calculate the start and end dates for the week (Monday to Sunday)
     start_date = selected_date - timedelta(days=selected_date.weekday())  # Monday
     end_date = start_date + timedelta(days=6)  # Sunday
 
-    # Query the database for timesheet entries for this week
-    # No need to use strftime here, as the date field is already a DATE type
     entries = TimesheetEntry.query.filter(
         TimesheetEntry.DateofEntry >= start_date,
         TimesheetEntry.DateofEntry <= end_date,
         TimesheetEntry.EmpID== emp.EMPID
     ).all()
 
-    # Initialize the summary for all 7 days with default values of 0
+
     summary = {}
     for i in range(7):
         day = start_date + timedelta(days=i)
@@ -163,16 +158,14 @@ def view_summary():
             'total_time': 0
         }
 
-    # Add values from the database entries to the corresponding days in the summary
     for entry in entries:
-        entry_date = entry.DateofEntry  # Already a date object from the database
+        entry_date = entry.DateofEntry  
         summary[entry_date]['billable_time'] += entry.billable_time or 0
         summary[entry_date]['nonbillable_admin_time'] += entry.nonbillable_admin_time or 0
         summary[entry_date]['nonbillable_training_time'] += entry.nonbillable_training_time or 0
         summary[entry_date]['unavailable_time'] += entry.unavailable_time or 0
         summary[entry_date]['total_time'] += entry.total_time or 0
 
-    # Calculate overall totals for the week
     overall_totals = {
         'billable_time': sum([day_data['billable_time'] for day_data in summary.values()]),
         'nonbillable_admin_time': sum([day_data['nonbillable_admin_time'] for day_data in summary.values()]),
