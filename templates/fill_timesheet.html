@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fill Timesheet</title>
+    <!-- Flatpickr CSS (Minimalist Theme) -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_green.css"
+    />
+
+    <!-- Flatpickr and jQuery -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+      /* Form Styling */
+      form {
+        margin: 20px;
+        padding: 20px;
+        max-width: 600px;
+        background-color: #f7f7f7;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      label {
+        display: block;
+        margin: 10px 0 5px;
+        font-weight: bold;
+      }
+      input[type="text"],
+      select,
+      textarea {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      input[readonly] {
+        background-color: #e9ecef;
+      }
+      button {
+        padding: 10px 20px;
+        background-color: #28a745;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #218838;
+      }
+    </style>
+  </head>
+    <body>
+      <h2>Fill Timesheet</h2>
+
+      <form method="POST" action="/timesheet/fill">
+        <!-- Readonly Fields from Employee Table -->
+        <label for="ename">Employee Name:</label>
+        <input
+          type="text"
+          id="ename"
+          name="ename"
+          value="{{ emp.EName }}"
+          readonly
+        /><br />
+
+        <label for="linemanager">Line Manager Name:</label>
+        <input
+          type="text"
+          id="linemanager"
+          name="linemanager"
+          value="{{ emp.LineManager }}"
+          readonly
+        /><br />
+
+        <label for="empID">Employee ID:</label>
+        <input
+          type="text"
+          id="empID"
+          name="empID"
+          value="{{ emp.EMPID }}"
+          readonly
+        /><br />
+
+        <label for="team">Team:</label>
+        <input
+          type="text"
+          id="team"
+          name="team"
+          value="{{ emp.Team }}"
+          readonly
+        /><br />
+
+        <label for="username">Username:</label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          value="{{ emp.username }}"
+          readonly
+        /><br />
+
+        <!-- Select Project Code -->
+        <label for="project_code">Project Code:</label>
+        <select id="project_code" name="project_code">
+          <option value="P001">Project P001</option>
+          <option value="P002">Project P002</option>
+          <option value="P003">Project P003</option></select
+        ><br />
+
+        <!-- Comments -->
+        <label for="comments">Comments:</label>
+        <textarea id="comments" name="comments"></textarea><br />
+
+        <!-- Date of Entry -->
+        <label for="date_of_entry">Date of Entry:</label>
+        <input
+          type="text"
+          id="date_of_entry"
+          name="date_of_entry"
+          placeholder="Select dates"
+        /><br />
+
+        <!-- Duration -->
+        <label for="hours">Duration Hours:</label>
+        <select id="hours" name="hours">
+          {% for hour in range(0, 9) %}
+          <option value="{{ hour }}">{{ hour }}</option>
+          {% endfor %}
+        </select>
+        <label for="minutes">Duration Minutes:</label>
+        <select id="minutes" name="minutes">
+          <option value="0">0</option>
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="15">15</option>
+          <option value="20">20</option>
+          <option value="25">25</option>
+          <option value="30">30</option>
+          <option value="35">35</option>
+          <option value="40">40</option>
+          <option value="45">45</option>
+          <option value="50">50</option>
+          <option value="55">55</option></select
+        ><br />
+
+        <!-- Allocation Type -->
+        <label for="allocation_type">Allocation Type:</label>
+        <select id="allocation_type" name="allocation_type">
+          <option value="billable">Billable</option>
+          <option value="non-billable">Non-Billable</option></select
+        ><br />
+
+        <!-- Categories 1, 2, and 3 -->
+        <label for="category_1">Category 1:</label>
+        <select id="category_1" name="category_1">
+          <!-- Options populated by JavaScript --></select
+        ><br />
+
+        <label for="category_2">Category 2:</label>
+        <select id="category_2" name="category_2">
+          <!-- Options populated by JavaScript --></select
+        ><br />
+
+        <label for="category_3">Category 3:</label>
+        <select id="category_3" name="category_3">
+          <!-- Options populated by JavaScript --></select
+        ><br />
+
+        <!-- Hidden fields to ensure submission of unselected categories -->
+        <input
+          type="hidden"
+          id="hidden_category_2"
+          name="category_2"
+          value=""
+        />
+        <input
+          type="hidden"
+          id="hidden_category_3"
+          name="category_3"
+          value=""
+        />
+
+        <button type="submit">Submit Timesheet</button>
+      </form>
+
+      <!-- Include Flatpickr JS -->
+      <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+      <script>
+        // Initialize flatpickr for Date of Entry with multi-date selection
+        flatpickr("#date_of_entry", {
+          mode: "multiple",
+          dateFormat: "Y-m-d",
+        });
+
+        // Handle Allocation Type and Category Interconnections
+        document
+          .getElementById("allocation_type")
+          .addEventListener("change", function () {
+            const category1 = document.getElementById("category_1");
+            const category2 = document.getElementById("category_2");
+            const category3 = document.getElementById("category_3");
+            category1.innerHTML = "";
+            category2.innerHTML = '<option value=""></option>'; // Always keep an empty option
+            category3.innerHTML = '<option value=""></option>'; // Always keep an empty option
+
+            // Clear hidden values for categories 2 and 3
+            document.getElementById("hidden_category_2").value = "";
+            document.getElementById("hidden_category_3").value = "";
+
+            if (this.value === "billable") {
+              category1.innerHTML = `
+                    <option value="CatB1">Cat B1</option>
+                    <option value="CatB2">Cat B2</option>`;
+            } else {
+              category1.innerHTML = `
+                    <option value="Admin">Admin</option>
+                    <option value="Training">Training</option>`;
+            }
+
+            category1.addEventListener("change", function () {
+              category2.innerHTML = '<option value=""></option>'; // Always reset with empty option
+              category3.innerHTML = '<option value=""></option>'; // Reset category 3
+
+              // Populate Category 2 based on Category 1 selection
+              if (this.value === "CatB1") {
+                category2.innerHTML += `<option value="CatB1.1">Cat B1.1</option>
+                                            <option value="CatB1.2">Cat B1.2</option>`;
+              } else if (this.value === "CatB2") {
+                category2.innerHTML += `<option value="CatB2.1">Cat B2.1</option>
+                                            <option value="CatB2.2">Cat B2.2</option>`;
+              } else if (this.value === "Admin") {
+                category2.innerHTML += `<option value="A1">A1</option>
+                                            <option value="A2">A2</option>`;
+              } else if (this.value === "Training") {
+                category2.innerHTML += `<option value="T1">T1</option>
+                                            <option value="T2">T2</option>`;
+              }
+
+              // Update hidden field for category_2
+              document.getElementById("hidden_category_2").value =
+                category2.value;
+            });
+
+            category2.addEventListener("change", function () {
+              category3.innerHTML = '<option value=""></option>'; // Always reset with empty option
+
+              // Populate Category 3 based on Category 2 selection
+              if (this.value === "A1") {
+                category3.innerHTML += `<option value="A1.1">A1.1</option>
+                                            <option value="A1.2">A1.2</option>`;
+              } else if (this.value === "A2") {
+                category3.innerHTML += `<option value="A2.1">A2.1</option>
+                                            <option value="A2.2">A2.2</option>`;
+              } else if (this.value === "T1") {
+                category3.innerHTML += `<option value="T1.1">T1.1</option>
+                                            <option value="T1.2">T1.2</option>`;
+              }
+
+              // Update hidden field for category_3
+              document.getElementById("hidden_category_3").value =
+                category3.value;
+            });
+          });
+      </script>
+    </body>
+  </html>
+</html>

@@ -58,16 +58,74 @@ def timesheet_home():
     return render_template('timesheet_home.html', emp=emp, is_manager=is_manager)
 
 # Fill Timesheet
+from flask import Flask, render_template, request, redirect, session, url_for
+from models import db, Employee, TimesheetEntry
+from datetime import datetime
+import uuid  # For generating unique IDs
 @app.route('/timesheet/fill', methods=['GET', 'POST'])
 def fill_timesheet():
     if 'EMPID' not in session:
         return redirect(url_for('login'))
 
-    if request.method == 'POST':
-        # Add timesheet entry logic here
-        pass
+    emp = Employee.query.filter_by(EMPID=session['EMPID']).first()
 
-    return render_template('fill_timesheet.html')
+    if request.method == 'POST':
+        dates = request.form['date_of_entry'].split(',')  # Handling multiple date selection
+
+        for date in dates:
+            total_time = (float(request.form['hours']) * 60 + float(request.form['minutes'])) / 60  # Total time in hours
+
+            # Determine the allocation type and assign the correct billable or non-billable time
+            allocation_type = request.form['allocation_type']
+            category_1 = request.form.get('category_1', None)
+                # Debugging
+            print(f"Allocation Type: {allocation_type}")
+            print(f"Category 1: {category_1}")
+            billable_time = 0
+            nonbillable_admin_time = 0
+            nonbillable_training_time = 0
+
+            if allocation_type == 'billable':
+                billable_time = total_time
+            elif allocation_type == 'non-billable':
+                if category_1 == 'Admin':
+                    nonbillable_admin_time = total_time
+                elif category_1 == 'Training':
+                    nonbillable_training_time = total_time
+
+            entry = TimesheetEntry(
+                Uniq_ID=str(uuid.uuid4()),  # Generate unique ID
+                EName=emp.EName,
+                EmpID=emp.EMPID,
+                Team=emp.Team,
+                LineManager=emp.LineManager,
+                DateofEntry=date,
+                StartTime=request.form['hours'],  # Hours worked
+                EndTime=request.form['minutes'],
+                Hours=request.form['hours'],
+                Minutes=request.form['minutes'],
+                billable_time=billable_time,
+                nonbillable_admin_time=nonbillable_admin_time,
+                nonbillable_training_time=nonbillable_training_time,
+                AllocationType=allocation_type,
+                Category1=category_1,
+                Category2=request.form.get('category_2', None),
+                Category3=request.form.get('category_3', None),
+                ProjectCode=request.form['project_code'],
+                Comment=request.form['comments'],
+                Status='Pending',
+                SubmitDate=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                LastUploadDate=datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                LastUpdatedBy=emp.username
+            )
+            # Insert into the database
+            db.session.add(entry)
+
+        db.session.commit()
+        return redirect(url_for('timesheet_home'))
+
+    return render_template('fill_timesheet.html', emp=emp)
+
 
 # View Timesheet Summary
 @app.route('/timesheet/summary')
