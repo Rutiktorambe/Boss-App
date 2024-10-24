@@ -13,46 +13,8 @@
     <!-- Flatpickr and jQuery -->
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <style>
-      /* Form Styling */
-      form {
-        margin: 20px;
-        padding: 20px;
-        max-width: 1000px;
-        background-color: #f7f7f7;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      }
-      label {
-        display: block;
-        margin: 10px 0 5px;
-        font-weight: bold;
-      }
-      input[type="text"],
-      select,
-      textarea {
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 15px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-      }
-      input[readonly] {
-        background-color: #e9ecef;
-      }
-      button {
-        padding: 10px 20px;
-        background-color: #28a745;
-        color: #fff;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-      }
-      button:hover {
-        background-color: #218838;
-      }
-    </style>
+        
+    
   </head>
     <body>
       <h2>Fill Timesheet</h2>
@@ -66,7 +28,7 @@
           name="ename"
           value="{{ emp.EName }}"
           readonly
-        /><br />
+        />
 
         <label for="linemanager">Line Manager Name:</label>
         <input
@@ -75,7 +37,7 @@
           name="linemanager"
           value="{{ emp.LineManager }}"
           readonly
-        /><br />
+        />
 
         <label for="empID">Employee ID:</label>
         <input
@@ -84,7 +46,7 @@
           name="empID"
           value="{{ emp.EMPID }}"
           readonly
-        /><br />
+        />
 
         <label for="team">Team:</label>
         <input
@@ -93,7 +55,7 @@
           name="team"
           value="{{ emp.Team }}"
           readonly
-        /><br />
+        />
 
         <label for="username">Username:</label>
         <input
@@ -110,11 +72,9 @@
           <option value="P001">Project P001</option>
           <option value="P002">Project P002</option>
           <option value="P003">Project P003</option></select
-        ><br />
+        >
 
-        <!-- Comments -->
-        <label for="comments">Comments:</label>
-        <textarea id="comments" name="comments"></textarea><br />
+       
 
         <!-- Date of Entry -->
         <label for="date_of_entry">Date of Entry:</label>
@@ -123,7 +83,7 @@
           id="date_of_entry"
           name="date_of_entry"
           placeholder="Select dates"
-        /><br />
+        />
 
         <!-- Duration -->
         <label for="hours">Duration Hours:</label>
@@ -153,23 +113,23 @@
         <select id="allocation_type" name="allocation_type">
           <option value="billable">Billable</option>
           <option value="non-billable">Non-Billable</option></select
-        ><br />
+        >
 
         <!-- Categories 1, 2, and 3 -->
         <label for="category_1">Category 1:</label>
         <select id="category_1" name="category_1">
           <!-- Options populated by JavaScript --></select
-        ><br />
+        >
 
         <label for="category_2">Category 2:</label>
         <select id="category_2" name="category_2">
           <!-- Options populated by JavaScript --></select
-        ><br />
+        >
 
         <label for="category_3">Category 3:</label>
         <select id="category_3" name="category_3">
           <!-- Options populated by JavaScript --></select
-        ><br />
+        >
 
         <!-- Hidden fields to ensure submission of unselected categories -->
         <input
@@ -183,7 +143,11 @@
           id="hidden_category_3"
           name="category_3"
           value=""
-        />
+        /> <br>
+
+         <!-- Comments -->
+         <label for="comments">Comments:</label>
+         <textarea id="comments" name="comments"></textarea><br />
 
         <button type="submit">Submit Timesheet</button>
       </form>

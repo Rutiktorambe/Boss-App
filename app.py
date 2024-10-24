@@ -196,13 +196,6 @@ def next_week():
 
 
 
-
-
-
-
-
-
-
 # # Route for home page (protected)
 # @app.route('/error')
 # def error():
@@ -221,6 +214,16 @@ def next_week():
 #     return  redirect(url_for('error'))
 
 
+
+
+
+@app.route('/success')
+def success():
+    if 'EMPID' not in session:
+        return redirect(url_for('login'))
+
+    emp = Employee.query.filter_by(EMPID=session['EMPID']).first()
+    return render_template('success/success.html',emp=emp,)
 
 
 
