@@ -62,6 +62,7 @@ from flask import Flask, render_template, request, redirect, session, url_for
 from models import db, Employee, TimesheetEntry
 from datetime import datetime
 import uuid  # For generating unique IDs
+
 @app.route('/timesheet/fill', methods=['GET', 'POST'])
 def fill_timesheet():
     if 'EMPID' not in session:
@@ -127,16 +128,92 @@ def fill_timesheet():
     return render_template('fill_timesheet.html', emp=emp)
 
 
-# View Timesheet Summary
-@app.route('/timesheet/summary')
+
+@app.route('/timesheet/summary', methods=['GET'])
 def view_summary():
+    # Get the date parameter or use the current date
     if 'EMPID' not in session:
         return redirect(url_for('login'))
 
     emp = Employee.query.filter_by(EMPID=session['EMPID']).first()
-    entries = TimesheetEntry.query.filter_by(EmpID=emp.EMPID).all()
+    selected_date_str = request.args.get('date', datetime.today().strftime('%Y-%m-%d'))
     
-    return render_template('view_summary.html', entries=entries)
+    # Convert the string to a date object if needed
+    selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
+
+    # Calculate the start and end dates for the week (Monday to Sunday)
+    start_date = selected_date - timedelta(days=selected_date.weekday())  # Monday
+    end_date = start_date + timedelta(days=6)  # Sunday
+
+    # Query the database for timesheet entries for this week
+    # No need to use strftime here, as the date field is already a DATE type
+    entries = TimesheetEntry.query.filter(
+        TimesheetEntry.DateofEntry >= start_date,
+        TimesheetEntry.DateofEntry <= end_date,
+        TimesheetEntry.EmpID== emp.EMPID
+    ).all()
+
+    # Initialize the summary for all 7 days with default values of 0
+    summary = {}
+    for i in range(7):
+        day = start_date + timedelta(days=i)
+        summary[day] = {
+            'billable_time': 0,
+            'nonbillable_admin_time': 0,
+            'nonbillable_training_time': 0,
+            'unavailable_time': 0,
+            'total_time': 0
+        }
+
+    # Add values from the database entries to the corresponding days in the summary
+    for entry in entries:
+        entry_date = entry.DateofEntry  # Already a date object from the database
+        summary[entry_date]['billable_time'] += entry.billable_time or 0
+        summary[entry_date]['nonbillable_admin_time'] += entry.nonbillable_admin_time or 0
+        summary[entry_date]['nonbillable_training_time'] += entry.nonbillable_training_time or 0
+        summary[entry_date]['unavailable_time'] += entry.unavailable_time or 0
+        summary[entry_date]['total_time'] += entry.total_time or 0
+
+    # Calculate overall totals for the week
+    overall_totals = {
+        'billable_time': sum([day_data['billable_time'] for day_data in summary.values()]),
+        'nonbillable_admin_time': sum([day_data['nonbillable_admin_time'] for day_data in summary.values()]),
+        'nonbillable_training_time': sum([day_data['nonbillable_training_time'] for day_data in summary.values()]),
+        'unavailable_time': sum([day_data['unavailable_time'] for day_data in summary.values()]),
+        'total_time': sum([day_data['total_time'] for day_data in summary.values()])
+    }
+
+    return render_template('view_summary.html', summary=summary, overall_totals=overall_totals, start_date=start_date, end_date=end_date)
+
+
+
+@app.route('/previous_week', methods=['GET'])
+def previous_week():
+    selected_date = request.args.get('date', datetime.today().strftime('%Y-%m-%d'))
+    selected_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
+    previous_week_date = selected_date - timedelta(days=7)
+    return redirect(url_for('view_summary', date=previous_week_date.strftime('%Y-%m-%d')))
+
+@app.route('/next_week', methods=['GET'])
+def next_week():
+    selected_date = request.args.get('date', datetime.today().strftime('%Y-%m-%d'))
+    selected_date = datetime.strptime(selected_date, '%Y-%m-%d').date()
+    next_week_date = selected_date + timedelta(days=7)
+    return redirect(url_for('view_summary', date=next_week_date.strftime('%Y-%m-%d')))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 if __name__ == '__main__':
     with app.app_context():
